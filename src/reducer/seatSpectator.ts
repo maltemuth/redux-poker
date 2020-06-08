@@ -18,7 +18,11 @@ const seatSpectator = (
     seat,
     chips: STARTING_CHIPS,
     currentCards: [],
-    isActive: true,
+    isSittingOut: false,
+    isReady: false,
+    revealedCards: [],
+    wantsToShow: [],
+    wantsToSitOut: false,
   };
 
   return {

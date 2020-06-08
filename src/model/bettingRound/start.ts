@@ -2,6 +2,7 @@ import {
   PokerTableState,
   Player,
   BettingRoundType,
+  PlayerActionType,
 } from "../../PokerTableState";
 import { create, shuffle } from "@malte.muth/poker-hands/dist/src";
 import placeBet from "../player/placeBet";
@@ -34,7 +35,11 @@ const start = (table: PokerTableState): PokerTableState => {
     currentRound: {
       ...table.currentRound,
       pots: [],
-      lastPlayerActions: [],
+      lastPlayerActions: table.currentRound.lastPlayerActions.filter(
+        (playerAction) =>
+          playerAction.actionType !== PlayerActionType.AllIn &&
+          playerAction.actionType !== PlayerActionType.Fold
+      ),
       currentPlayer: table.dealer,
       amountNeededForCalling: 0,
       bets: [],

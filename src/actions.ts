@@ -20,6 +20,8 @@ export const HIDE_CARD = "HIDE_CARD";
 export const SET_SITTING_OUT_NEXT_ROUND = "SET_SITTING_OUT_NEXT_ROUND";
 export const SET_RETURNING_NEXT_ROUND = "SET_RETURNING_NEXT_ROUND";
 
+export const SET_CARDS = "SET_CARDS";
+
 export interface AddSpectatorAction extends Action {
   type: typeof ADD_SPECTATOR;
   spectator: Spectator;
@@ -83,7 +85,15 @@ export interface SetReturningNextRoundAction extends Action {
   id: PlayerId;
 }
 
-export type PokerAction =
+export interface SetCardsAction extends Action {
+  type: typeof SET_CARDS;
+  cardsByPlayerId: { [playerId: string]: Card[] };
+  flop: Card[];
+  turn: Card[];
+  river: Card[];
+}
+
+export type PlayerInitiatedAction =
   | AddSpectatorAction
   | RemoveSpectatorAction
   | SeatSpectatorAction
@@ -96,6 +106,10 @@ export type PokerAction =
   | HideCardAction
   | SetSittingOutNextRoundAction
   | SetReturningNextRoundAction;
+
+export type GameInitiatedAction = SetCardsAction;
+
+export type PokerAction = PlayerInitiatedAction | GameInitiatedAction;
 
 export const addSpectator = (spectator: Spectator): AddSpectatorAction => ({
   type: ADD_SPECTATOR,
@@ -168,4 +182,23 @@ export const setReturningNextRound = ({
 }: Player): SetReturningNextRoundAction => ({
   type: SET_RETURNING_NEXT_ROUND,
   id,
+});
+
+export const setCards = (
+  flop: Card[],
+  turn: Card[],
+  river: Card[],
+  ...players: Player[]
+): SetCardsAction => ({
+  type: SET_CARDS,
+  flop,
+  turn,
+  river,
+  cardsByPlayerId: players.reduce(
+    (map, player) => ({
+      ...map,
+      [player.id]: player.currentCards,
+    }),
+    {}
+  ),
 });

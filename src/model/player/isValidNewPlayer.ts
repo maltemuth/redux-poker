@@ -7,6 +7,7 @@ const isValidNewPlayer = (table: PokerTableState, player: Player) => {
   if (!isValidPlayer(player)) return false;
 
   if (!table.spectators.find(({ id }) => id === player.id)) return false;
+
   if (!seatIsValid(player.seat) || seatIsTaken(table, player.seat))
     return false;
 

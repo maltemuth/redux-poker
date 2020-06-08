@@ -1,4 +1,4 @@
-import { Card } from "@malte.muth/poker-hands/dist/model/card/Card";
+import { Card } from "@malte.muth/poker-hands/dist/src/model/card/Card";
 
 export enum BettingRoundType {
   PreFlop = "PreFlop",
