@@ -1,0 +1,22 @@
+{
+  "name": "@malte.muth/redux-poker",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-typescript": "^7.10.1",
+    "@types/jest": "^25.2.3",
+    "@types/redux": "^3.6.0",
+    "jest": "^26.0.1",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@malte.muth/poker-hands": "^0.3.1",
+    "redux": "^4.0.5"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
