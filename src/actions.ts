@@ -145,7 +145,7 @@ export const setPlayerUnready = ({ id }: Player): SetPlayerUnreadyAction => ({
   id,
 });
 
-export const placeBet = ({ id }: Player, bet: Bet): PlaceBetAction => ({
+export const placeBet = (bet: Bet): PlaceBetAction => ({
   type: PLACE_BET,
   bet,
 });

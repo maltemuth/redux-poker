@@ -20,9 +20,8 @@ const finish = (table: PokerTableState): PokerTableState => {
   );
 
   const betsByAmount = sortedBets.reduce((map, bet) => {
-    map[bet.amount.toString()] = map[bet.amount.toString()].concat([bet]) || [
-      bet,
-    ];
+    map[bet.amount.toString()] = map[bet.amount.toString()] || [];
+    map[bet.amount.toString()].push(bet);
     return map;
   }, {} as { [amount: string]: Bet[] });
 

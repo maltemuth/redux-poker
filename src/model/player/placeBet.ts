@@ -6,7 +6,6 @@ import {
   PlayerActionType,
   PlayerId,
 } from "../../PokerTableState";
-import getNextPlayer from "./getNextPlayer";
 
 const placeBet = (
   table: PokerTableState,
@@ -86,8 +85,6 @@ const placeBet = (
     .filter((action) => action.playerId !== player.id)
     .concat([newAction!]);
 
-  const nextPlayer = getNextPlayer(table.players, player.id);
-
   return {
     ...table,
     players: updatedPlayers,
@@ -97,7 +94,6 @@ const placeBet = (
       bets: updatedBets,
       amountNeededForCalling: amountNeededForCalling,
       lastPlayerToRaise: lastPlayerToRaise,
-      currentPlayer: nextPlayer.id,
     },
   };
 };

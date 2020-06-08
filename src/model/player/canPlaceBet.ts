@@ -14,13 +14,19 @@ const canPlaceBet = (
     // players can always go all-in
     return true;
   }
+  const totalAfterBetting = amount + getCurrentBetAmount(table, player);
 
-  if (
-    amount + getCurrentBetAmount(table, player) <
-    table.currentRound.amountNeededForCalling
-  ) {
+  if (totalAfterBetting < table.currentRound.amountNeededForCalling) {
     return false;
   }
+
+  // needs to raise by at least the big blind
+  if (
+    totalAfterBetting > table.currentRound.amountNeededForCalling &&
+    totalAfterBetting <
+      table.currentRound.amountNeededForCalling + 2 * table.smallBlind
+  )
+    return false;
 
   return true;
 };

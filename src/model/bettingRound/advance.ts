@@ -21,7 +21,7 @@ const advance = (table: PokerTableState): PokerTableState => {
   while (
     lastPlayerAction &&
     (lastPlayerAction.actionType === PlayerActionType.Fold ||
-      lastPlayerAction?.actionType === PlayerActionType.Raise)
+      lastPlayerAction.actionType === PlayerActionType.AllIn)
   ) {
     nextPlayer = getNextPlayer(table.players, nextPlayer.id);
 

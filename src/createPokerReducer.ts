@@ -22,6 +22,8 @@ import setPlayerReady from "./reducer/setPlayerReady";
 import setPlayerUnready from "./reducer/setPlayerUnready";
 import setSittingOutNextRound from "./reducer/setSittingOutNextRound";
 import setReturningNextRound from "./reducer/setReturningNextRound";
+import placeBet from "./reducer/placeBet";
+import fold from "./reducer/fold";
 
 const createPokerTableReducer = (): Reducer<PokerTableState, PokerAction> => (
   state = createPokerTable(),
@@ -45,7 +47,9 @@ const createPokerTableReducer = (): Reducer<PokerTableState, PokerAction> => (
     case SET_RETURNING_NEXT_ROUND:
       return setReturningNextRound(state, action);
     case PLACE_BET:
+      return placeBet(state, action);
     case FOLD:
+      return fold(state, action);
 
     default:
       return state;

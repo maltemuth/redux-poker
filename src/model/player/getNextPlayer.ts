@@ -1,21 +1,31 @@
 import { PlayerId, Player } from "../../PokerTableState";
 
-const getNextPlayer = (players: Player[], current: PlayerId): Player => {
-  const currentIndex = players.findIndex(({ id }) => current === id);
+const getNextPlayer = (
+  players: Player[],
+  current: PlayerId,
+  advance = 1
+): Player => {
+  const currentPlayer = players.find(({ id }) => current === id);
 
-  if (null === currentIndex)
+  if (!currentPlayer)
     throw new Error(
       `Tried to get a next player for id ${current}, but this id is not in the list of given players`
     );
-  const playersAfter = players.filter((_, index) => index > currentIndex);
 
-  if (playersAfter.length > 0) return playersAfter[0];
+  const sortedPlayers = players.sort((a, b) => a.seat - b.seat);
+  const playersAfter = sortedPlayers.filter(
+    ({ seat }) => seat > currentPlayer.seat
+  );
 
-  const playersBefore = players.filter((_, index) => index < currentIndex);
+  const playersBefore = sortedPlayers.filter(
+    ({ seat }) => seat < currentPlayer.seat
+  );
 
-  if (playersBefore.length > 0) return playersBefore[0];
+  const nextPlayer = playersAfter[0] || playersBefore[0] || currentPlayer;
 
-  return players[currentIndex];
+  if (advance === 1) return nextPlayer;
+
+  return getNextPlayer(players, nextPlayer.id, advance - 1);
 };
 
 export default getNextPlayer;
