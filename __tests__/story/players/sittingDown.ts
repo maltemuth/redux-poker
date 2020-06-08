@@ -21,7 +21,9 @@ describe("seating players at a table", () => {
 
   test("adding players", () => {
     players.forEach((player) => game.dispatch(addSpectator(player)));
-    players.forEach((player) => game.dispatch(seatSpectator(player, player)));
+    players.forEach((player, index) =>
+      game.dispatch(seatSpectator(player, index))
+    );
 
     const table = game.getState();
 
@@ -34,10 +36,12 @@ describe("seating players at a table", () => {
     thirdPlayer.seat = 1;
 
     players.forEach((player) => game.dispatch(addSpectator(player)));
-    players.forEach((player) => game.dispatch(seatSpectator(player, player)));
+    players.forEach((player, index) =>
+      game.dispatch(seatSpectator(player, index))
+    );
 
     game.dispatch(addSpectator(thirdPlayer));
-    game.dispatch(seatSpectator(thirdPlayer, thirdPlayer));
+    game.dispatch(seatSpectator(thirdPlayer, 1));
 
     const table = game.getState();
 
@@ -50,10 +54,12 @@ describe("seating players at a table", () => {
     thirdPlayer.name = "Player 2";
 
     players.forEach((player) => game.dispatch(addSpectator(player)));
-    players.forEach((player) => game.dispatch(seatSpectator(player, player)));
+    players.forEach((player, index) =>
+      game.dispatch(seatSpectator(player, index))
+    );
 
     game.dispatch(addSpectator(thirdPlayer));
-    game.dispatch(seatSpectator(thirdPlayer, thirdPlayer));
+    game.dispatch(seatSpectator(thirdPlayer, 3));
 
     const table = game.getState();
 

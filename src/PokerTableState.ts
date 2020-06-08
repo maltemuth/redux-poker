@@ -18,13 +18,11 @@ export enum PlayerActionType {
 export type PlayerId = string;
 
 export interface Spectator {
-  name: String;
+  name: string;
   id: PlayerId;
 }
 
 export interface Player extends Spectator {
-  name: string;
-  id: PlayerId;
   isSittingOut: boolean;
   wantsToSitOut: boolean;
   isReady: boolean;

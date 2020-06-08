@@ -6,15 +6,14 @@ const STARTING_CHIPS = 3000;
 
 const seatSpectator = (
   table: PokerTableState,
-  { player }: SeatSpectatorAction
+  { id, seat }: SeatSpectatorAction
 ): PokerTableState => {
-  if (!isValidNewPlayer(table, player)) return table;
+  const candidate = table.spectators.find((spectator) => spectator.id === id);
 
-  const { id, name, seat } = player;
+  if (!candidate) return table;
 
   const newPlayer: Player = {
-    id,
-    name,
+    ...candidate,
     seat,
     chips: STARTING_CHIPS,
     currentCards: [],
@@ -24,6 +23,8 @@ const seatSpectator = (
     wantsToShow: [],
     wantsToSitOut: false,
   };
+
+  if (!isValidNewPlayer(table, newPlayer)) return table;
 
   return {
     ...table,

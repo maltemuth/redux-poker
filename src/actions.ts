@@ -34,8 +34,8 @@ export interface RemoveSpectatorAction extends Action {
 
 export interface SeatSpectatorAction extends Action {
   type: typeof SEAT_SPECTATOR;
-  player: Player;
   id: PlayerId;
+  seat: number;
 }
 
 export interface UnseatPlayerAction extends Action {
@@ -122,15 +122,12 @@ export const removeSpectator = ({ id }: Spectator): RemoveSpectatorAction => ({
 });
 
 export const seatSpectator = (
-  { id }: Spectator,
-  player: Player
+  spectator: Spectator,
+  seat: number
 ): SeatSpectatorAction => ({
   type: SEAT_SPECTATOR,
-  player: {
-    ...player,
-    id,
-  },
-  id,
+  seat,
+  id: spectator.id,
 });
 
 export const unseatPlayer = ({ id }: Player): UnseatPlayerAction => ({
