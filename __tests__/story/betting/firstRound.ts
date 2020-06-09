@@ -213,4 +213,35 @@ describe("betting in the first round", () => {
       table.smallBlind * 12
     );
   });
+
+  test("when all players call the big blind, the big blind player can still raise", () => {
+    const table = game.getState();
+    const currentPlayer = table.players.find(
+      ({ id }) => id === table.currentRound.currentPlayer
+    )!;
+    const smallBlind = getNextPlayer(table.players, currentPlayer.id);
+    const bigBlind = getNextPlayer(table.players, smallBlind.id);
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 2,
+        playerId: currentPlayer.id,
+      })
+    );
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 1,
+        playerId: smallBlind.id,
+      })
+    );
+
+    const tableAfterBet = game.getState();
+
+    expect(tableAfterBet.currentRound.bettingRound).toEqual(
+      BettingRoundType.PreFlop
+    );
+    expect(tableAfterBet.board).toEqual([]);
+    expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
+  });
 });

@@ -44,7 +44,15 @@ const advance = (table: PokerTableState): PokerTableState => {
       }
     );
 
-    if (allPlayersHavePlacedEnoughOrHaveNoChipsRemaining) return finish(table);
+    const bigBlind = getNextPlayer(table.players, table.dealer, 2);
+
+    if (
+      table.currentRound.bettingRound === BettingRoundType.PreFlop &&
+      nextPlayer.id === bigBlind.id
+    ) {
+      // well ... continue
+    } else if (allPlayersHavePlacedEnoughOrHaveNoChipsRemaining)
+      return finish(table);
   }
 
   return {
