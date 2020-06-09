@@ -16,9 +16,23 @@ const finish = (table: PokerTableState): PokerTableState => {
 
   // collect bets into pots
 
-  const sortedBets = table.currentRound.bets.sort(
-    (a, b) => a.amount - b.amount
-  );
+  const betsOfFoldedPlayers = table.currentRound.bets.filter((bet) => {
+    const lastAction = table.currentRound.lastPlayerActions.find(
+      ({ playerId }) => playerId === bet.playerId
+    );
+
+    return lastAction && lastAction.actionType === PlayerActionType.Fold;
+  });
+
+  const otherBets = table.currentRound.bets.filter((bet) => {
+    const lastAction = table.currentRound.lastPlayerActions.find(
+      ({ playerId }) => playerId === bet.playerId
+    );
+
+    return !lastAction || lastAction.actionType !== PlayerActionType.Fold;
+  });
+
+  const sortedBets = otherBets.sort((a, b) => a.amount - b.amount);
 
   const betsByAmount = sortedBets.reduce((map, bet) => {
     map[bet.amount.toString()] = map[bet.amount.toString()] || [];
@@ -63,6 +77,12 @@ const finish = (table: PokerTableState): PokerTableState => {
         playerIds: newPots[0].playerIds,
       }
     : newPots[0];
+
+  newMainPot.amount += betsOfFoldedPlayers.reduce(
+    (sum, { amount }) => sum + amount,
+    0
+  );
+
   const [_, ...remainingNewPots] = newPots;
 
   const [__, ...remainingOldPots] = table.currentRound.pots;

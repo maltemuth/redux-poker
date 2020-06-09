@@ -272,11 +272,13 @@ describe("betting in the first round", () => {
 
     const tableAfterBet = game.getState();
 
-    console.log(tableAfterBet.currentRound, "tableAfterBet");
-
     expect(tableAfterBet.currentRound.bettingRound).toEqual(
       BettingRoundType.Flop
     );
     expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
+    expect(tableAfterBet.currentRound.pots.length).toEqual(1);
+    expect(tableAfterBet.currentRound.pots[0].amount).toEqual(
+      table.smallBlind * 5
+    );
   });
 });
