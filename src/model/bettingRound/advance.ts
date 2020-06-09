@@ -31,12 +31,20 @@ const advance = (table: PokerTableState): PokerTableState => {
   }
 
   if (nextPlayer.id === table.currentRound.lastPlayerToRaise) {
-    const allPlayersHavePlacedEnoughOrHaveNoChipsRemaining = table.players.every(
+    const allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining = table.players.every(
       (player) => {
+        const lastAction = table.currentRound.lastPlayerActions.find(
+          ({ playerId }) => playerId === player.id
+        );
+
+        if (lastAction && lastAction.actionType === PlayerActionType.Fold)
+          return true;
         const playerBet = table.currentRound.bets.find(
           (bet) => bet.playerId === player.id
         );
+
         if (!playerBet) return false;
+
         return (
           playerBet.amount === table.currentRound.amountNeededForCalling ||
           player.chips === 0
@@ -46,13 +54,39 @@ const advance = (table: PokerTableState): PokerTableState => {
 
     const bigBlind = getNextPlayer(table.players, table.dealer, 2);
 
+    // console.log(
+    //   allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining,
+    //   "allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining"
+    // );
+
+    // console.log(nextPlayer, "nextPlayer");
+    // console.log(bigBlind, "bigBlind");
+
+    // console.log(
+    //   table.currentRound.bettingRound,
+    //   "table.currentRound.bettingRound"
+    // );
+
+    // console.log(
+    //   table.currentRound.bettingRound === BettingRoundType.PreFlop &&
+    //     nextPlayer.id === bigBlind.id,
+    //   "(table.currentRound.bettingRound === BettingRoundType.PreFlop && nextPlayer.id === bigBlind.id)"
+    // );
+
+    // console.log(
+    //   allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&
+    //     (table.currentRound.bettingRound !== BettingRoundType.PreFlop ||
+    //       nextPlayer.id !== bigBlind.id),
+    //   "allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&(table.currentRound.bettingRound !== BettingRoundType.PreFlop || nextPlayer.id !== bigBlind.id)"
+    // );
+
     if (
-      table.currentRound.bettingRound === BettingRoundType.PreFlop &&
-      nextPlayer.id === bigBlind.id
+      allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&
+      (table.currentRound.bettingRound !== BettingRoundType.PreFlop ||
+        nextPlayer.id !== bigBlind.id)
     ) {
-      // well ... continue
-    } else if (allPlayersHavePlacedEnoughOrHaveNoChipsRemaining)
       return finish(table);
+    }
   }
 
   return {

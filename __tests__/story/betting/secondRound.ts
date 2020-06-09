@@ -11,6 +11,7 @@ import {
   seatSpectator,
   setPlayerReady,
   placeBet,
+  fold,
 } from "../../../src/actions";
 import getNextPlayer from "../../../src/model/player/getNextPlayer";
 
@@ -63,5 +64,80 @@ describe("betting in the second round", () => {
       BettingRoundType.Flop
     );
     expect(tableAfterBet.currentRound.currentPlayer).toEqual(smallBlind.id);
+  });
+
+  test("if the small blind folded in the first round, the big blind starts the second", () => {
+    const table = game.getState();
+    const currentPlayer = table.players.find(
+      ({ id }) => id === table.currentRound.currentPlayer
+    )!;
+    const smallBlind = getNextPlayer(table.players, table.dealer);
+    const bigBlind = getNextPlayer(table.players, smallBlind.id);
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 4,
+        playerId: currentPlayer.id,
+      })
+    );
+
+    game.dispatch(fold(smallBlind));
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 2,
+        playerId: bigBlind.id,
+      })
+    );
+
+    const tableAfterBet = game.getState();
+
+    expect(tableAfterBet.currentRound.bettingRound).toEqual(
+      BettingRoundType.Flop
+    );
+    expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
+  });
+
+  test("if the small blind folded in the first round, the small blind will not need to bet again", () => {
+    const table = game.getState();
+    const smallBlind = getNextPlayer(table.players, table.dealer);
+    const bigBlind = getNextPlayer(table.players, smallBlind.id);
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 4,
+        playerId: table.currentRound.currentPlayer,
+      })
+    );
+
+    game.dispatch(fold(smallBlind));
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 2,
+        playerId: bigBlind.id,
+      })
+    );
+
+    game.dispatch(
+      placeBet({
+        amount: 0,
+        playerId: bigBlind.id,
+      })
+    );
+
+    game.dispatch(
+      placeBet({
+        amount: 0,
+        playerId: table.dealer,
+      })
+    );
+
+    const tableAfterBet = game.getState();
+
+    expect(tableAfterBet.currentRound.bettingRound).toEqual(
+      BettingRoundType.Turn
+    );
+    expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
   });
 });

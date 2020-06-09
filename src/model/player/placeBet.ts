@@ -59,6 +59,11 @@ const placeBet = (
       playerId: player.id,
       betAmount: clampedAmount,
     };
+
+    // if no one has raised yet, regard the first check as "raise" for
+    // determining when the round should end
+    if (table.currentRound.lastPlayerToRaise === "")
+      lastPlayerToRaise = player.id;
   }
 
   if (
