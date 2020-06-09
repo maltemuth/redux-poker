@@ -3,10 +3,11 @@ import {
   BettingRoundType,
   Bet,
   Pot,
+  PlayerActionType,
 } from "../../PokerTableState";
 import { Card } from "@malte.muth/poker-hands/dist/src/model/card/Card";
 import finishTurn from "../turn/finish";
-import start from "./start";
+import advance from "./advance";
 
 const finish = (table: PokerTableState): PokerTableState => {
   const currentBettingRound = table.currentRound.bettingRound;
@@ -84,7 +85,7 @@ const finish = (table: PokerTableState): PokerTableState => {
     };
   });
 
-  const tableWithUpdatedPots = {
+  const tableWithUpdatedPots: PokerTableState = {
     ...table,
     players: playersWithChipsRemoved,
     currentRound: {
@@ -118,11 +119,19 @@ const finish = (table: PokerTableState): PokerTableState => {
     currentRound: {
       ...tableWithUpdatedPots.currentRound,
       bettingRound: nextBettingRound!,
+      lastPlayerActions: table.currentRound.lastPlayerActions.filter(
+        ({ actionType }) =>
+          actionType === PlayerActionType.Fold ||
+          actionType === PlayerActionType.AllIn
+      ),
+      currentPlayer: table.dealer,
+      lastPlayerToRaise: "",
+      amountNeededForCalling: 0,
     },
     board: newBoard!,
   };
 
-  return start(tableBeforeNextRound);
+  return advance(tableBeforeNextRound);
 };
 
 export default finish;
