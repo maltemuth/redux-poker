@@ -57,7 +57,7 @@ describe("betting in the first round", () => {
     ).toEqual(undefined);
   });
 
-  test("first player cannot bet in pre-flop", () => {
+  test("first player cannot bet initially", () => {
     const table = game.getState();
     const firstPlayer = getNextPlayer(table.players, table.dealer);
 
@@ -68,7 +68,7 @@ describe("betting in the first round", () => {
     expect(tableAfterBet.currentRound.bets.length).toEqual(2);
   });
 
-  test("first player cannot bet in pre-flop", () => {
+  test("second player cannot bet initially", () => {
     const table = game.getState();
     const secondPlayer = getNextPlayer(table.players, table.dealer, 2);
 
