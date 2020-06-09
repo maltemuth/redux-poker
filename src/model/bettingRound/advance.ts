@@ -5,6 +5,7 @@ import {
 } from "../../PokerTableState";
 import getNextPlayer from "../player/getNextPlayer";
 import finish from "./finish";
+import player from "../../../__tests__/lib/player";
 
 const advance = (table: PokerTableState): PokerTableState => {
   // check if this is already finished
@@ -30,6 +31,18 @@ const advance = (table: PokerTableState): PokerTableState => {
     );
   }
 
+  const bigBlind = getNextPlayer(table.players, table.dealer, 2);
+
+  if (table.currentRound.currentPlayer === bigBlind.id) {
+    const lastAction = table.currentRound.lastPlayerActions.find(
+      ({ playerId }) => playerId === bigBlind.id
+    );
+    // if the big blind checked the option, round is over.
+    if (lastAction && lastAction.actionType === PlayerActionType.Check) {
+      return finish(table);
+    }
+  }
+
   if (nextPlayer.id === table.currentRound.lastPlayerToRaise) {
     const allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining = table.players.every(
       (player) => {
@@ -52,36 +65,10 @@ const advance = (table: PokerTableState): PokerTableState => {
       }
     );
 
-    const bigBlind = getNextPlayer(table.players, table.dealer, 2);
-
-    // console.log(
-    //   allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining,
-    //   "allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining"
-    // );
-
-    // console.log(nextPlayer, "nextPlayer");
-    // console.log(bigBlind, "bigBlind");
-
-    // console.log(
-    //   table.currentRound.bettingRound,
-    //   "table.currentRound.bettingRound"
-    // );
-
-    // console.log(
-    //   table.currentRound.bettingRound === BettingRoundType.PreFlop &&
-    //     nextPlayer.id === bigBlind.id,
-    //   "(table.currentRound.bettingRound === BettingRoundType.PreFlop && nextPlayer.id === bigBlind.id)"
-    // );
-
-    // console.log(
-    //   allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&
-    //     (table.currentRound.bettingRound !== BettingRoundType.PreFlop ||
-    //       nextPlayer.id !== bigBlind.id),
-    //   "allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&(table.currentRound.bettingRound !== BettingRoundType.PreFlop || nextPlayer.id !== bigBlind.id)"
-    // );
-
     if (
       allPlayersHaveFoldedPlacedEnoughOrHaveNoChipsRemaining &&
+      // the big blind has a check option if she was the last player to raise, i.e. everyone else called
+      // so the round does not end here
       (table.currentRound.bettingRound !== BettingRoundType.PreFlop ||
         nextPlayer.id !== bigBlind.id)
     ) {

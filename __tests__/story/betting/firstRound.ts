@@ -12,6 +12,7 @@ import {
   seatSpectator,
   setPlayerReady,
   placeBet,
+  fold,
 } from "../../../src/actions";
 import getNextPlayer from "../../../src/model/player/getNextPlayer";
 
@@ -242,6 +243,40 @@ describe("betting in the first round", () => {
       BettingRoundType.PreFlop
     );
     expect(tableAfterBet.board).toEqual([]);
+    expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
+  });
+
+  test("when small blind folds and big blind checks, there is only one pot", () => {
+    const table = game.getState();
+    const currentPlayer = table.players.find(
+      ({ id }) => id === table.currentRound.currentPlayer
+    )!;
+    const smallBlind = getNextPlayer(table.players, currentPlayer.id);
+    const bigBlind = getNextPlayer(table.players, smallBlind.id);
+
+    game.dispatch(
+      placeBet({
+        amount: table.smallBlind * 2,
+        playerId: currentPlayer.id,
+      })
+    );
+
+    game.dispatch(fold(smallBlind));
+
+    game.dispatch(
+      placeBet({
+        amount: 0,
+        playerId: bigBlind.id,
+      })
+    );
+
+    const tableAfterBet = game.getState();
+
+    console.log(tableAfterBet.currentRound, "tableAfterBet");
+
+    expect(tableAfterBet.currentRound.bettingRound).toEqual(
+      BettingRoundType.Flop
+    );
     expect(tableAfterBet.currentRound.currentPlayer).toEqual(bigBlind.id);
   });
 });
