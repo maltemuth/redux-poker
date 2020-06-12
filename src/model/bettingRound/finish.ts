@@ -71,10 +71,13 @@ const finish = (table: PokerTableState): PokerTableState => {
 
   // merge the last pot with the first new one
 
+  // newPots might be an empty array if no bets were placed this round
+  // which happens in showdowns or when all players but one fold
   const newMainPot: Pot = table.currentRound.pots[0]
     ? {
-        amount: newPots[0].amount + table.currentRound.pots[0].amount,
-        playerIds: newPots[0].playerIds,
+        amount: (newPots[0]?.amount || 0) + table.currentRound.pots[0].amount,
+        playerIds:
+          newPots[0]?.playerIds || table.currentRound.pots[0].playerIds,
       }
     : newPots[0];
 
@@ -91,23 +94,10 @@ const finish = (table: PokerTableState): PokerTableState => {
     ...remainingNewPots.reverse(),
     newMainPot,
     ...remainingOldPots,
-  ];
-
-  const playersWithChipsRemoved = table.players.map((player) => {
-    const bet = table.currentRound.bets.find(
-      (bet) => bet.playerId === player.id
-    );
-    if (!bet) return player;
-
-    return {
-      ...player,
-      chips: player.chips - bet.amount,
-    };
-  });
+  ].filter((_) => _);
 
   const tableWithUpdatedPots: PokerTableState = {
     ...table,
-    players: playersWithChipsRemoved,
     currentRound: {
       ...table.currentRound,
       bets: [],
@@ -115,7 +105,7 @@ const finish = (table: PokerTableState): PokerTableState => {
     },
   };
 
-  // go through all pots and remove players that have folded
+  // @todo go through all pots and remove players that have folded
 
   if (currentBettingRound === BettingRoundType.River) {
     return finishTurn(table);

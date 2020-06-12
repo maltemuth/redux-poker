@@ -5,7 +5,6 @@ import {
 } from "../../PokerTableState";
 import getNextPlayer from "../player/getNextPlayer";
 import finish from "./finish";
-import player from "../../../__tests__/lib/player";
 
 const advance = (table: PokerTableState): PokerTableState => {
   // check if this is already finished
@@ -29,6 +28,11 @@ const advance = (table: PokerTableState): PokerTableState => {
     lastPlayerAction = table.currentRound.lastPlayerActions.find(
       ({ playerId }) => playerId === nextPlayer.id
     );
+  }
+
+  // if no player but the current one can do anything, finish the round
+  if (nextPlayer.id === table.currentRound.currentPlayer) {
+    return finish(table);
   }
 
   const bigBlind = getNextPlayer(table.players, table.dealer, 2);
