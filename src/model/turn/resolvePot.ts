@@ -1,31 +1,46 @@
 import { PokerTableState, Pot, Player } from "../../PokerTableState";
-import { getBestHand, isBetterThan } from "@malte.muth/poker-hands/dist/src";
+import {
+  getBestHand,
+  isBetterThan,
+  hasEqualValue,
+} from "@malte.muth/poker-hands/dist/src";
 
 const resolvePot = (table: PokerTableState, pot: Pot): PokerTableState => {
-  const players = pot.playerIds.map((id) =>
-    table.players.find((player) => player.id === id)
-  );
+  const players = pot.playerIds
+    .map((id) => table.players.find((player) => player.id === id))
+    .filter((_) => _);
 
-  let bestPlayer = players[0];
-  let bestHand = getBestHand([...players[0]!.currentCards, ...table.board]);
+  const playersSortedByHand = players.sort((a, b) => {
+    const aHand = getBestHand([...a!.currentCards, ...table.board]);
+    const bHand = getBestHand([...b!.currentCards, ...table.board]);
 
-  players.forEach((player) => {
-    const cards = [...player!.currentCards, ...table.board];
-    const candidate = getBestHand(cards);
-
-    if (isBetterThan(candidate!, bestHand!)) {
-      bestHand = candidate;
-      bestPlayer = player;
-    }
+    if (isBetterThan(aHand!, bHand!)) return +1;
+    if (hasEqualValue(aHand!, bHand!)) return 0;
+    return -1;
   });
 
-  const updatedPlayer: Player = {
-    ...bestPlayer!,
-    chips: bestPlayer!.chips + pot.amount,
-  };
+  const firstPlayerWithBestHand = playersSortedByHand[0];
+  const firstPlayersHand = getBestHand([
+    ...firstPlayerWithBestHand!.currentCards,
+    ...table.board,
+  ]);
+
+  const playersWithBestHand = players.filter((player) => {
+    const playerHand = getBestHand([...player!.currentCards, ...table.board]);
+    return hasEqualValue(playerHand!, firstPlayersHand!);
+  }) as Player[];
+
+  const bestPlayerIds = playersWithBestHand.map(({ id }) => id);
+
+  const potPayout = Math.floor(pot.amount / playersWithBestHand.length);
 
   const updatedPlayers = table.players.map((player) => {
-    if (player.id === bestPlayer!.id) return updatedPlayer;
+    if (bestPlayerIds.includes(player.id)) {
+      return {
+        ...player,
+        chips: player.chips + potPayout,
+      };
+    }
 
     return player;
   });
